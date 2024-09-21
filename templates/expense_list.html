@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense List</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1c1c1c; /* Black background */
+            background-image: url('https://www.transparenttextures.com/patterns/asfalt-dark.png'); /* Small print background */
+            color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            color: #ff4c4c; /* Red text */
+        }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #444;
+        }
+        th {
+            background-color: #333;
+        }
+        .chart-container {
+            width: 25%; /* Set the width to 25% */
+            margin: 20px auto;
+        }
+        canvas {
+            background-color: #333;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Saved Expenses</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for expense in expenses %}
+            <tr>
+                <td>{{ expense.get_category_display }}</td>
+                <td>{{ expense.description }}</td>
+                <td>{{ expense.amount }}</td>
+                <td>{{ expense.date }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Pie Chart Section -->
+    <div class="chart-container">
+        <canvas id="expensePieChart" width="150" height="150"></canvas> <!-- Set width and height to 150 for smaller size -->
+    </div>
+
+    <script>
+        const ctx = document.getElementById('expensePieChart').getContext('2d');
+
+        // Data preparation for the pie chart
+        const categories = JSON.parse('{{ categories|escapejs }}'); // Correctly parse JSON data
+        const totals = JSON.parse('{{ totals|escapejs }}');         // Correctly parse JSON data
+
+        const data = {
+            labels: categories,
+            datasets: [{
+                label: 'Total Expenses by Category',
+                data: totals,
+                backgroundColor: [
+                    '#ff4c4c',
+                    '#ff8c4c',
+                    '#ffcf4c',
+                    '#4cff4c',
+                    '#4c8cff',
+                    '#cf4cff',
+                ],
+                borderColor: '#000',
+                borderWidth: 2,
+                hoverOffset: 10 // Lift effect on hover
+            }]
+        };
+
+        const config = {
+            type: 'pie',
+            data: data,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Expense Distribution by Category'
+                    }
+                }
+            },
+        };
+
+        const expensePieChart = new Chart(ctx, config);
+    </script>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Expense List</title>
+        <style>
+            /* Add your existing CSS here */
+    
+            .budget-summary {
+                position: absolute;
+                bottom: 20px;
+                right: 20px;
+                text-align: right;
+                background-color: #f1f1f1;
+                padding: 10px;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Add your existing table of expenses here -->
+    
+        <div class="budget-summary">
+            <h2>Monthly Budget: {{ monthly_budget }}</h2>
+            <h2>Total Expenses: {{ total_expenses }}</h2>
+        </div>
+    
+
+</body>
+</html>
