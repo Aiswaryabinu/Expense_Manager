@@ -6,63 +6,6 @@ import json
 from django.contrib.auth.decorators import login_required
 
 
-
-#def add_expense(request):
-    #if request.method == 'POST':
-       # form = ExpenseForm(request.POST)
-        #if form.is_valid():
-            #form.save()
-            #return redirect('expense_list')  # Redirect to an expense list view after saving
-    #else:
-        #form = ExpenseForm()
-    #return render(request, 'add_expense.html', {'form': form})
-
-
-
-
-
-
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from .models import Expense
-from collections import defaultdict
-import json
-
-@login_required
-def expense_list(request):
-    # Filter expenses by the current logged-in user
-    expenses = Expense.objects.filter(user=request.user)
-
-    # Initialize a dictionary to store totals for each category
-    category_totals = defaultdict(float)
-
-    for expense in expenses:
-        category_totals[expense.category] += float(expense.amount)
-
-    # Prepare data for pie chart
-    categories = list(category_totals.keys())
-    totals = list(category_totals.values())
-
-    # Convert the data to JSON for JavaScript
-    categories_json = json.dumps(categories)
-    totals_json = json.dumps(totals)
-
-    context = {
-        'expenses': expenses,
-        'categories': categories_json,
-        'totals': totals_json
-    }
-    return render(request, 'expense_list.html', context)
-
-    
-
-
-# expenseapp/views.py
-
-
-
-
-
 # expenseapp/views.py
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
@@ -107,9 +50,41 @@ def logout_view(request):
     return redirect('login')
 
 # Dashboard View
+
+
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from .models import Expense, MonthlyBudget
+from django.db.models import Sum
+
 @login_required
 def dashboard_view(request):
-    return render(request, 'dashboard.html')
+    user = request.user
+    total_expenses = Expense.objects.filter(user=user).aggregate(Sum('amount'))['amount__sum'] or 0
+    monthly_budget = MonthlyBudget.objects.filter(user=user).first()
+    
+    budget_amount = monthly_budget.budget_amount if monthly_budget else 0
+    remaining_budget = budget_amount - total_expenses
+
+    # Ensure remaining budget is non-negative
+    if remaining_budget < 0:
+        remaining_budget = 0
+    
+    # Check if expenses exceed the budget
+    budget_exceeded = total_expenses > budget_amount
+
+    context = {
+        'total_expenses': total_expenses,
+        'monthly_budget': monthly_budget,
+        'remaining_budget': remaining_budget,
+        'budget_exceeded': budget_exceeded
+    }
+    
+    return render(request, 'dashboard.html', context)
+
+
+
+    
 
 
 from django.contrib.auth.decorators import login_required
@@ -129,3 +104,82 @@ def add_expense(request):
         form = ExpenseForm()
     return render(request, 'add_expense.html', {'form': form})
 
+
+from django.shortcuts import render, redirect
+from django.utils import timezone
+from django.contrib.auth.decorators import login_required
+from .models import MonthlyBudget, Expense
+from .forms import MonthlyBudgetForm
+from django.db.models import Sum
+
+@login_required
+def set_monthly_budget(request):
+    current_month = timezone.now().date().replace(day=1)
+
+    # Check if the budget is already set for this month
+    try:
+        budget = MonthlyBudget.objects.get(user=request.user, month=current_month)
+        return redirect('dashboard')
+    except MonthlyBudget.DoesNotExist:
+        budget = None
+
+    if request.method == 'POST':
+        form = MonthlyBudgetForm(request.POST)
+        if form.is_valid():
+            budget_instance = form.save(commit=False)
+            budget_instance.user = request.user
+            budget_instance.month = current_month
+            budget_instance.save()
+            return redirect('dashboard')
+    else:
+        form = MonthlyBudgetForm()
+
+    return render(request, 'set_monthly_budget.html', {'form': form})
+
+
+
+
+from django.shortcuts import render
+from django.utils import timezone
+from django.contrib.auth.decorators import login_required
+from .models import Expense, MonthlyBudget
+from django.db.models import Sum
+
+@login_required
+def expense_list(request):
+    current_month = timezone.now().date().replace(day=1)
+
+    # Get all expenses for the current user in the current month
+    expenses = Expense.objects.filter(user=request.user, date__month=current_month.month, date__year=current_month.year)
+
+    # Calculate total expenses for the current month
+    total_expenses = expenses.aggregate(Sum('amount'))['amount__sum'] or 0
+
+    # Get the monthly budget for the current user
+    try:
+        budget = MonthlyBudget.objects.get(user=request.user, month=current_month)
+        monthly_budget = budget.budget_amount
+    except MonthlyBudget.DoesNotExist:
+        monthly_budget = None
+
+    # Get the expense totals by category for the pie chart
+    category_expenses = expenses.values('category').annotate(total=Sum('amount'))
+
+    # Prepare data for the pie chart
+    categories = [entry['category'] for entry in category_expenses]
+    totals = [float(entry['total']) for entry in category_expenses]
+
+    context = {
+        'expenses': expenses,
+        'total_expenses': total_expenses,
+        'monthly_budget': monthly_budget,
+        'categories': categories,
+        'totals': totals,
+        'current_month': current_month,
+    }
+
+    return render(request, 'expense_list.html', context)
+
+
+def index(request):
+    return render(request, 'index.html')

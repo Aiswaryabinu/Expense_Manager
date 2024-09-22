@@ -8,77 +8,47 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
-            margin: 0;
             padding: 20px;
         }
 
-        .container {
-            width: 80%;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .header {
-            text-align: center;
-            padding-bottom: 20px;
-        }
-
-        .links {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 20px;
-        }
-
-        .links a {
-            text-decoration: none;
-            padding: 10px 20px;
-            background-color: #4CAF50;
+        .notification {
+            background-color: red;
             color: white;
+            padding: 10px;
+            margin-bottom: 15px;
             border-radius: 5px;
+            text-align: center;
+            font-size: 18px;
         }
 
-        .budget-box {
+        .dashboard {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
             padding: 20px;
-            margin: 20px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-        }
-
-        .budget-summary {
-            float: right;
-            text-align: right;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Welcome to Your Dashboard</h1>
-        </div>
+    <div class="dashboard">
+        <h1>Dashboard</h1>
 
-        <div class="links">
-            <a href="{% url 'add_expense' %}">Add Expense</a>
-            <a href="{% url 'expense_list' %}">View Expenses</a>
-            <a href="{% url 'logout' %}">Logout</a>
+        <!-- Display notification if budget is exceeded -->
+        {% if budget_exceeded %}
+        <div class="notification">
+            You have exceeded your monthly budget!
         </div>
+        {% endif %}
 
-        <div class="budget-box">
-            <h2>Set Your Monthly Budget</h2>
-            <form method="POST">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit">Set Budget</button>
-            </form>
-        </div>
+        <p>Total Expenses: {{ total_expenses }}</p>
+        <p>Monthly Budget: {{ monthly_budget.budget_amount }}</p>
+        <p>Remaining Budget: {{ remaining_budget }}</p>
 
-        <div class="budget-summary">
-            <h2>Monthly Budget: {{ monthly_budget }}</h2>
-            <h2>Total Expenses So Far: {{ total_expenses }}</h2>
-        </div>
+        <a href="{% url 'add_expense' %}">Add Expense</a> |
+        <a href="{% url 'expense_list' %}">View Expenses</a> |
+        <a href="{% url 'set_monthly_budget' %}">Set Monthly Budget</a> |
+        <a href="{% url 'logout' %}">Logout</a>
     </div>
 </body>
 </html>
