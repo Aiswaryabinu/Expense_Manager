@@ -7,26 +7,73 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #000; /* Black background */
+            color: #fff; /* White text */
             padding: 20px;
-        }
-
-        .notification {
-            background-color: red;
-            color: white;
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            text-align: center;
-            font-size: 18px;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
         }
 
         .dashboard {
             max-width: 800px;
-            margin: 0 auto;
-            background-color: #fff;
+            margin: 20px;
+            background-color: #1c1c1c; /* Dark gray for the dashboard */
             padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5); /* Red shadow */
+            border-radius: 15px; /* Rounded corners */
+            transition: transform 0.3s, box-shadow 0.3s; /* Animation effects */
+        }
+
+        .dashboard:hover {
+            transform: scale(1.02); /* Scale effect on hover */
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.7); /* Intensified shadow */
+        }
+
+        .notification {
+            background-color: red; /* Red notification */
+            color: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 18px;
+            animation: fadeIn 0.5s; /* Animation for notification */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        p {
+            margin: 10px 0;
+        }
+
+        a {
+            display: inline-block;
+            color: red; /* Red links */
+            text-decoration: none;
+            margin: 10px 0;
+            padding: 10px 15px;
+            border: 2px solid red;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s; /* Animation for links */
+        }
+
+        a:hover {
+            background-color: red; /* Red background on hover */
+            color: #fff; /* White text on hover */
+        }
+
+        /* Responsive design */
+        @media (max-width: 600px) {
+            .dashboard {
+                width: 90%;
+            }
         }
     </style>
 </head>
@@ -41,14 +88,16 @@
         </div>
         {% endif %}
 
-        <p>Total Expenses: {{ total_expenses }}</p>
-        <p>Monthly Budget: {{ monthly_budget.budget_amount }}</p>
-        <p>Remaining Budget: {{ remaining_budget }}</p>
+        <p>Total Expenses: {{ total_expenses }} Rupees</p>
+        <p>Monthly Budget: {{ monthly_budget.budget_amount }} Rupees</p>
+        <p>Remaining Budget: {{ remaining_budget }} Rupees</p>
 
-        <a href="{% url 'add_expense' %}">Add Expense</a> |
-        <a href="{% url 'expense_list' %}">View Expenses</a> |
-        <a href="{% url 'set_monthly_budget' %}">Set Monthly Budget</a> |
-        <a href="{% url 'logout' %}">Logout</a>
+        <div class="action-buttons">
+            <a href="{% url 'add_expense' %}">Add Expense</a>
+            <a href="{% url 'expense_list' %}">View Expenses</a>
+            <a href="{% url 'set_monthly_budget' %}">Set Monthly Budget</a>
+            <a href="{% url 'logout' %}">Logout</a>
+        </div>
     </div>
 </body>
 </html>
