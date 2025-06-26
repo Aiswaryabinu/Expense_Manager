@@ -1,6 +1,6 @@
 # Expense Manager
 
-Expense Manager is a user-friendly application designed to help you track your expenses, manage your budget, and gain insights into your spending habits. With a simple interface and powerful features, you can easily record, categorize, and analyze your financial transactions.
+Expense Manager is a user-friendly Django web application designed to help you track your expenses, manage your budget, and gain insights into your spending habits. With a clean interface and powerful features, you can take control of your personal finances.
 
 ## Features
 
@@ -16,42 +16,60 @@ Expense Manager is a user-friendly application designed to help you track your e
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) (if the project is Node-based)
-- [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
-- (Other dependencies specific to your stack, e.g., Python, Django, Flutter, etc.)
+- [Python 3.8+](https://www.python.org/)
+- [pip](https://pip.pypa.io/en/stable/)
+- [virtualenv](https://virtualenv.pypa.io/en/latest/) (recommended)
+- (Optional) [PostgreSQL](https://www.postgresql.org/) or another production-ready database
 
 ### Installation
 
 1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/Aiswaryabinu/Expense_Manager.git
-   cd Expense_Manager
-   ```
+    ```bash
+    git clone https://github.com/Aiswaryabinu/Expense_Manager.git
+    cd Expense_Manager
+    ```
 
-2. **Install dependencies:**
-   ```bash
-   npm install
-   # or
-   yarn install
-   ```
+2. **Create and activate a virtual environment:**
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  # On Windows: venv\Scripts\activate
+    ```
 
-3. **Set up environment variables:**
-   - Create a `.env` file in the root directory.
-   - Add your configuration (example below):
-     ```
-     DB_URL=your_database_url
-     SECRET_KEY=your_secret_key
-     ```
+3. **Install Python dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-4. **Run the application:**
-   ```bash
-   npm start
-   # or
-   yarn start
-   ```
+4. **Set up environment variables:**
+    - Copy `.env.example` to `.env` (or create a `.env` file in the root directory).
+    - Add your configuration (example below):
+        ```
+        SECRET_KEY=your_django_secret_key
+        DEBUG=True
+        DB_NAME=your_db_name
+        DB_USER=your_db_user
+        DB_PASSWORD=your_db_password
+        DB_HOST=localhost
+        DB_PORT=5432
+        ```
 
-5. **Open in browser:**
-   Visit [http://localhost:3000](http://localhost:3000)
+5. **Apply database migrations:**
+    ```bash
+    python manage.py migrate
+    ```
+
+6. **Create a superuser (admin account):**
+    ```bash
+    python manage.py createsuperuser
+    ```
+
+7. **Run the development server:**
+    ```bash
+    python manage.py runserver
+    ```
+
+8. **Open in browser:**
+    Visit [http://localhost:8000](http://localhost:8000)
 
 ## Usage
 
